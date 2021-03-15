@@ -6,8 +6,8 @@ import 'package:text_editor/src/font_option_model.dart';
 import 'package:text_editor/src/text_style_model.dart';
 import 'package:text_editor/src/widget/color_palette.dart';
 import 'package:text_editor/src/widget/font_family.dart';
-import 'package:text_editor/src/widget/font_size.dart';
 import 'package:text_editor/src/widget/font_option_switch.dart';
+import 'package:text_editor/src/widget/font_size.dart';
 import 'package:text_editor/src/widget/text_alignment.dart';
 
 /// Instagram like text editor
@@ -92,9 +92,7 @@ class _TextEditorState extends State<TextEditor> {
     );
 
     // Initialize decorator
-    _doneButton = widget.decoration?.doneButton == null
-        ? Text('Done', style: TextStyle(color: Colors.white))
-        : widget.decoration.doneButton;
+    _doneButton = widget.decoration?.doneButton == null ? Text('Done', style: TextStyle(color: Colors.white)) : widget.decoration.doneButton;
 
     super.initState();
   }
@@ -109,15 +107,35 @@ class _TextEditorState extends State<TextEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData screenQuery = MediaQuery.of(context);
+
+    /* debugPrint(screenQuery.viewPadding.toString());
+    debugPrint(screenQuery.viewInsets.toString());
+    debugPrint(screenQuery.padding.toString()); */
+
+    final double screenHeight = screenQuery.size.height;
+    final double screenWidth = screenQuery.size.width;
+
+    final double wantedWidth = screenHeight * 9 / 16;
+    final double wantedHeight = screenWidth * 16 / 9;
+
+    // TODO: Rivedere per schermi con AspectRatio strani.
+    final double blackBottomMargin = screenHeight - wantedHeight - screenQuery.viewInsets.bottom - screenQuery.viewPadding.bottom - 13.0;
+    // debugPrint(blackBottomMargin.toString());
+
+    double bottomInset = -blackBottomMargin;
+    if (bottomInset < 0) bottomInset = 0.0;
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => _textStyleModel),
         ChangeNotifierProvider(create: (context) => _fontOptionModel),
       ],
       child: Container(
-        padding: EdgeInsets.only(right: 10, left: 10),
-        color: widget.backgroundColor,
+        color: Colors.black.withOpacity(0.6),
+        margin: EdgeInsets.only(bottom: bottomInset),
         child: Column(
+          mainAxisSize: MainAxisSize.max,
           children: [
             Row(
               children: [
@@ -146,9 +164,12 @@ class _TextEditorState extends State<TextEditor> {
                 Expanded(
                   child: Align(
                     alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: _editCompleteHandler,
-                      child: _doneButton,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: GestureDetector(
+                        onTap: _editCompleteHandler,
+                        child: _doneButton,
+                      ),
                     ),
                   ),
                 ),
@@ -164,8 +185,7 @@ class _TextEditorState extends State<TextEditor> {
                         child: Consumer<TextStyleModel>(
                           builder: (context, textStyleModel, child) {
                             return TextField(
-                              controller: TextEditingController()
-                                ..text = textStyleModel.text,
+                              controller: TextEditingController()..text = textStyleModel.text,
                               onChanged: (value) => textStyleModel.text = value,
                               maxLines: null,
                               keyboardType: TextInputType.multiline,
@@ -186,10 +206,7 @@ class _TextEditorState extends State<TextEditor> {
             Container(
               margin: EdgeInsets.only(bottom: 5),
               child: Consumer<FontOptionModel>(
-                builder: (context, model, child) =>
-                    model.status == FontOptionStatus.fontFamily
-                        ? FontFamily(model.fonts)
-                        : ColorPalette(model.colors),
+                builder: (context, model, child) => model.status == FontOptionStatus.fontFamily ? FontFamily(model.fonts) : ColorPalette(model.colors),
               ),
             ),
           ],
