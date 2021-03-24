@@ -10,7 +10,7 @@ class FontSize extends StatelessWidget {
         quarterTurns: 3,
         child: Slider(
           value: model.textStyle.fontSize,
-          min: 0,
+          min: 36,
           max: 100,
           divisions: 100,
           activeColor: Colors.white,

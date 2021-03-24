@@ -5,13 +5,13 @@ author: Mehdi Zarepour<mehdi.zarepoor@gmail.com>
 homepage: https://github.com/mehdizarepour/text_editor.git
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  provider: ^4.3.2+2
+  provider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

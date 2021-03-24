@@ -49,6 +49,11 @@ class TextEditor extends StatefulWidget {
   /// Decoration to customize the editor
   final EditorDecoration decoration;
 
+  /// Titolo per l'uscita.
+  final String doneText;
+
+  final VoidCallback onCancel;
+
   /// Create a [TextEditor] widget
   ///
   /// [fonts] list of font families that you want to use in editor.
@@ -67,6 +72,8 @@ class TextEditor extends StatefulWidget {
     this.onTextStyleChanged,
     this.onTextChanged,
     this.decoration,
+    @required this.doneText,
+    @required this.onCancel,
   });
 
   @override
@@ -92,7 +99,7 @@ class _TextEditorState extends State<TextEditor> {
     );
 
     // Initialize decorator
-    _doneButton = widget.decoration?.doneButton == null ? Text('Done', style: TextStyle(color: Colors.white)) : widget.decoration.doneButton;
+    _doneButton = widget.decoration?.doneButton == null ? Text(widget.doneText, style: TextStyle(color: Colors.white)) : widget.decoration.doneButton;
 
     super.initState();
   }
@@ -116,7 +123,7 @@ class _TextEditorState extends State<TextEditor> {
     final double screenHeight = screenQuery.size.height;
     final double screenWidth = screenQuery.size.width;
 
-    final double wantedWidth = screenHeight * 9 / 16;
+    // final double wantedWidth = screenHeight * 9 / 16;
     final double wantedHeight = screenWidth * 16 / 9;
 
     // TODO: Rivedere per schermi con AspectRatio strani.
@@ -139,36 +146,42 @@ class _TextEditorState extends State<TextEditor> {
           children: [
             Row(
               children: [
-                Expanded(child: Container()),
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextAlignment(
-                        left: widget.decoration?.alignment?.left,
-                        center: widget.decoration?.alignment?.center,
-                        right: widget.decoration?.alignment?.right,
-                      ),
-                      SizedBox(width: 20),
-                      FontOptionSwitch(
-                        fontFamilySwitch: widget.decoration?.fontFamily,
-                        colorPaletteSwitch: widget.decoration?.colorPalette,
-                      ),
-                      // TODO: Add text background color
-                      // SizedBox(width: 20),
-                      // TextBackgroundColor(),
-                    ],
-                  ),
+                Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextAlignment(
+                      left: widget.decoration?.alignment?.left,
+                      center: widget.decoration?.alignment?.center,
+                      right: widget.decoration?.alignment?.right,
+                    ),
+                    SizedBox(width: 20),
+                    FontOptionSwitch(
+                      fontFamilySwitch: widget.decoration?.fontFamily,
+                      colorPaletteSwitch: widget.decoration?.colorPalette,
+                    ),
+                    // TODO: Add text background color
+                    // SizedBox(width: 20),
+                    // TextBackgroundColor(),
+                  ],
                 ),
                 Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                        onTap: _editCompleteHandler,
-                        child: _doneButton,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.check, color: Colors.white),
+                            onPressed: _editCompleteHandler,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete_forever_outlined, color: Colors.white),
+                            onPressed: widget.onCancel,
+                          ),
+                        ],
                       ),
                     ),
                   ),
