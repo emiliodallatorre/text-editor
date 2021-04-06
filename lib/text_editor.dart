@@ -16,6 +16,8 @@ import 'package:text_editor/src/widget/text_alignment.dart';
 /// You can pass your text style to the widget
 /// and then get the edited text style
 class TextEditor extends StatefulWidget {
+  final EdgeInsets editorPadding;
+
   /// After edit process completed, [onEditCompleted] callback will be called.
   final void Function(TextStyle, TextAlign, String) onEditCompleted;
 
@@ -72,6 +74,7 @@ class TextEditor extends StatefulWidget {
     this.onTextStyleChanged,
     this.onTextChanged,
     this.decoration,
+    this.editorPadding,
     @required this.doneText,
     @required this.onCancel,
   });
@@ -112,6 +115,21 @@ class _TextEditorState extends State<TextEditor> {
     );
   }
 
+  /// Calcola il padding della tastiera.
+  EdgeInsets calculatePadding() {
+    final MediaQueryData screenQuery = MediaQuery.of(context);
+
+    double bottomPadding = screenQuery.viewInsets.bottom;
+    // bottomPadding += 250.0;
+    double bottomBlack = (screenQuery.size.height - screenQuery.viewInsets.top - (screenQuery.size.width / (9 / 16))) / 2;
+    if (screenQuery.size.width / (9 / 16) >= screenQuery.size.height) bottomBlack = 0.0;
+    // debugPrint(bottomBlack.toString());
+    bottomPadding -= bottomBlack;
+
+    if (bottomPadding < 0.0) bottomPadding = 0.0;
+    return EdgeInsets.only(bottom: bottomPadding);
+  }
+
   @override
   Widget build(BuildContext context) {
     final MediaQueryData screenQuery = MediaQuery.of(context);
@@ -140,7 +158,8 @@ class _TextEditorState extends State<TextEditor> {
       ],
       child: Container(
         color: Colors.black.withOpacity(0.6),
-        margin: EdgeInsets.only(bottom: bottomInset),
+        // margin: EdgeInsets.only(bottom: bottomInset),
+        margin: widget.editorPadding ?? calculatePadding(),
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
@@ -198,7 +217,8 @@ class _TextEditorState extends State<TextEditor> {
                         child: Consumer<TextStyleModel>(
                           builder: (context, textStyleModel, child) {
                             return TextField(
-                              controller: TextEditingController()..text = textStyleModel.text,
+                              controller: TextEditingController()
+                                ..text = textStyleModel.text,
                               onChanged: (value) => textStyleModel.text = value,
                               maxLines: null,
                               keyboardType: TextInputType.multiline,
